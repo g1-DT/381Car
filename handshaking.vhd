@@ -21,8 +21,6 @@ BEGIN
 			D0_PRIME <= GPIO_0(7 downto 0); --Pixel 1 from GPIO
 			D1_PRIME <= GPIO_0(15 downto 8); --Pixel 2 from GPIO
 			VALID_PRIME <= GPIO_0(16); --Valid bit from GPIO
-			
-			ACKNOWLEDGE_IN <= GPIO_0(34);
 		END IF;
 	END PROCESS;
 	
@@ -32,6 +30,8 @@ BEGIN
 			D0_IN <= D0_PRIME;
 			D1_IN <= D1_PRIME;
 			VALID_IN <= VALID_PRIME;
+			
+			ACKNOWLEDGE_IN <= '1';
 		END IF;
 	END PROCESS;
 	
@@ -42,6 +42,8 @@ BEGIN
 			IF(VALID_IN = '1') THEN --VALID_IN is the enable
 				GPIO_0(25 downto 18) <= D0_IN;
 				GPIO_0(33 downto 26) <= D1_IN;
+				
+				GPIO_0(34) <= ACKNOWLEDGE_IN;
 			END IF;
 		END IF;
 	END PROCESS;
