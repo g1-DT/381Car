@@ -29,6 +29,7 @@ BEGIN
 					END IF;					
 				WHEN Reader =>
 					IF() THEN
+					END IF;
 				WHEN Writer =>
 				WHEN Waiting =>
 --				WHEN Acknowledge =>
