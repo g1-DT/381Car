@@ -23,7 +23,7 @@ begin
 	process (CLOCK_50)
 	begin
 		if(rising_edge(CLOCK_50)) then
-			LEDG(0) <= readbits;
+				 LEDG(0) <= readbits;
 		end if;
 	end process;
   
@@ -38,6 +38,7 @@ begin
 			case present_state is
 				when resetState =>
 				 ready <= '1';
+				 readbits <= '0';
 				 ackno := GPIO_1(0);
 				 LEDR(1 downto 0) <= "00";
 				 present_state := idleState;
@@ -50,7 +51,7 @@ begin
 					LEDR(1 downto 0) <= "01";
 					present_state := present_state;
 				 end if;
-				when readState =>
+				when others =>
 				 if(KEY(3) = '0') then
 					readbits <= '1';
 					present_state := resetState;
