@@ -12,54 +12,61 @@ entity HandShake is
 end HandShake;
 
 architecture rtl of HandShake is
-	signal readbits : std_logic;
-	signal done  : std_logic;
-	signal data1 : std_logic;
+	signal done : std_logic;
+	signal readbits : std_logic;	
 	signal ready : std_logic;
 begin
 
-	GPIO_1(1) <= ready;
+	GPIO_1(10) <= ready;
 	
 	process (CLOCK_50)
+	variable readData : std_logic_vector(7 downto 0) := "00000000";
 	begin
 		if(rising_edge(CLOCK_50)) then
-				 LEDG(0) <= readbits;
+			done <= '0';
+			if(readbits = '1') then
+				readData := GPIO_1(7 downto 0);
+				done <= '1';
+			end if;
+			LEDG <= readData(7 downto 0);
 		end if;
 	end process;
   
-	process (CLOCK_50, KEY(3))
-		type state_type is (resetState, idleState, readState);
-		variable ackno : std_logic := '0';
-		variable present_state : state_type := resetState;
+	process (CLOCK_50)
+		type state_type is (readyState, idleState, readState);
+		variable ackno : std_logic;
+		variable present_state : state_type := idleState;
+		variable next_state : state_type;
 	begin
-		if(KEY(0) = '0') then
-			present_state := resetState;
-		elsif(rising_edge(CLOCK_50)) then
+		if(rising_edge(CLOCK_50)) then
 			case present_state is
-				when resetState =>
+				when readyState =>
+				 readBits <= '0';
+				 ackno := '0';
 				 ready <= '1';
-				 readbits <= '0';
-				 ackno := GPIO_1(0);
-				 LEDR(1 downto 0) <= "00";
-				 present_state := idleState;
+				 next_state := idleState;
 				when idleState =>
 				 --do stuff here
 				 if(ackno = '1') then
 					ready <= '0';
-					present_state := readState;
+					next_state := readState;
 				 else
+					ackno := GPIO_1(11);
 					LEDR(1 downto 0) <= "01";
-					present_state := present_state;
+					next_state := idleState;
 				 end if;
 				when others =>
-				 if(KEY(3) = '0') then
-					readbits <= '1';
-					present_state := resetState;
+				 if(done = '1') then
+					readbits <= '0';
+					next_state := readyState;
 				 else
+					readbits <= '1';
 					LEDR(1 downto 0) <= "10";
-					present_state := present_state;
+					next_state := readState;
 				 end if;
 			end case;
+			
+			present_state := next_state;
 		end if;
 	end process;
 end rtl;
