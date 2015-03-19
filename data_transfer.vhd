@@ -36,10 +36,12 @@ ARCHITECTURE behavioural OF data_transfer IS
 BEGIN
 
 --Signal for reading or writing
+--request bits
 	READER <= SW(0); -- Only need input of Reader since writer will be output signal
 	--READER <= GPIO_1(0);
 	WRITER <= SW(1);
 	--WRITER <= GPIO_1(1);
+--acknowledge bits
 	READ_READY <= SW(2);
 	--READ_READY <= GPIO_1(2);
 	WRITE_READY <= SW(3);
@@ -52,7 +54,6 @@ BEGIN
 	LEDR(2) <= READ_READY;
 	LEDR(3) <= WRITE_READY;
 	LEDR(17 downto 16) <= DATA;
-	
 	
 --FSM
 	PROCESS(CLOCK_50)
@@ -94,6 +95,8 @@ BEGIN
 					
 					IF(MODE = '1') THEN
 						--IF in writer mode, write value to GPIO_1
+						LEDR(13 downto 12) <= DATA; --display the data for testing
+						Done := '1';
 					END IF;
 					
 					IF (DONE = '1') THEN
@@ -101,7 +104,7 @@ BEGIN
 						DONE := '0';
 						CURRENT_STATE := Waiting;
 					END IF;
-				--WHEN others => CURRENT_STATE := Waiting; --Do nothing
+				WHEN others => CURRENT_STATE := Waiting; --Do nothing
 			END CASE;
 				LEDG(2) <= MODE;
 			END IF;
