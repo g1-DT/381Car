@@ -17,18 +17,23 @@ signal motor_l, motor_r : std_logic_vector(1 downto 0);
 signal go_forward, go_reverse, go_left, go_right : std_logic;
 begin
 	--pwmLimit <= '0';
-	motor_l <= "00";
-	motor_r <= "00";
+--	motor_l <= "00";
+--	motor_r <= "00";
+--	
+--	go_forward <= '0';
+--	go_reverse <= '0';
+--	go_left <= '0';
+--	go_right <= '0';
 	
-	go_forward <= '0';
-	go_reverse <= '0';
-	go_left <= '0';
-	go_right <= '0';
+	--go_forward <= GPIO_1(28);
+	--go_reverse <= GPIO_1(29);
+	--go_left <= GPIO_1(30);
+	--go_right <= GPIO_1(31);
+	go_forward <= SW(0);
+	go_reverse <= SW(1);
+	go_left <= SW(2);
+	go_right <= SW(3);
 	
-	go_forward <= GPIO_1(28);
-	go_reverse <= GPIO_1(29);
-	go_left <= GPIO_1(30);
-	go_right <= GPIO_1(31);
 	
 	GPIO_1(35 downto 34) <= motor_l;
 	GPIO_1(33 downto 32) <= motor_r;
@@ -41,18 +46,23 @@ begin
   begin
 		if(rising_edge(CLOCK_50)) then
 			if(go_forward = '1') then
+				LEDG(2 downto 0)<="101";
 				motor_l <= "01";
 				motor_r <= "01";
 			elsif(go_reverse = '1') then
+				LEDG(2 downto 0)<="001";
 				motor_l <= "10";
 				motor_r <= "10";
 			elsif(go_left = '1') then
+				LEDG(2 downto 0)<="010";
 				motor_l <= "00";
 				motor_r <= "01";
 			elsif(go_right = '1') then
+				LEDG(2 downto 0)<="100";
 				motor_l <= "01";
 				motor_r <= "00";
 			else
+				LEDG(2 downto 0)<="111";
 				motor_l <= "00";
 				motor_r <= "00";
 			end if;
