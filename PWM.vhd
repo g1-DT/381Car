@@ -6,8 +6,8 @@ entity PWM is
   port(CLOCK_50            : in  std_logic;
        SW                  : in  std_logic_vector(17 downto 0);
 		 GPIO_1					: inout std_logic_vector(35 downto 0);
-		 --7 downto 4 output to PWM
-		 --3 downto 0 input from pi
+		 --35 downto 32 output to PWM
+		 --31 downto 28 input from pi
 		 LEDG : out std_logic_vector(7 downto 0));
 end PWM;
 
@@ -17,13 +17,13 @@ signal motor_l, motor_r : std_logic_vector(1 downto 0) <= "00";
 signal go_forward, go_reverse, go_left, go_right : std_logic <= '0';
 begin
 
-	go_forward <= GPIO_1(0);
-	go_reverse <= GPIO_1(1);
-	go_left <= GPIO_1(2);
-	go_right <= GPIO(3);
+	go_forward <= GPIO_1(28);
+	go_reverse <= GPIO_1(29);
+	go_left <= GPIO_1(30);
+	go_right <= GPIO(31);
 	
-	GPIO_1(7 downto 6) <= motor_l;
-	GPIO_1(5 downto 4) <= motor_r;
+	GPIO_1(35 downto 34) <= motor_l;
+	GPIO_1(33 downto 32) <= motor_r;
 
   process (CLOCK_50, SW)
 	variable pwmcount : integer := 0;
