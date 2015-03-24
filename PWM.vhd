@@ -15,15 +15,17 @@ architecture rtl of PWM is
 signal motor_l, motor_r : std_logic_vector(1 downto 0);
 signal go_forward, go_reverse, go_left, go_right : std_logic;
 begin
-	go_forward <= SW(0);
-	go_reverse <= SW(1);
-	go_left <= SW(2);
-	go_right <= SW(3);
+	--currently using controls from the Pi
+	go_forward <= GPIO_1(28);
+	go_reverse <= GPIO_1(29);
+	go_left <= GPIO_1(30);
+	go_right <= GPIO_1(31);
 	
+	--output to the DC motors
 	GPIO_1(35 downto 34) <= motor_l;
 	GPIO_1(33 downto 32) <= motor_r;
 
-  process (CLOCK_50, SW)
+  process (CLOCK_50)
 	variable pwmcount : integer := 0;
 	variable PWM0val : std_logic := '0';
 	variable dec : integer := 0;
@@ -54,6 +56,13 @@ begin
 		end if;
 	end process;
 end rtl;
+
+
+
+
+
+
+
 
 
 --begin
