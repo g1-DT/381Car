@@ -12,28 +12,13 @@ entity PWM is
 end PWM;
 
 architecture rtl of PWM is
---signal pwmLimit : integer <= '0';
 signal motor_l, motor_r : std_logic_vector(1 downto 0);
 signal go_forward, go_reverse, go_left, go_right : std_logic;
 begin
-	--pwmLimit <= '0';
---	motor_l <= "00";
---	motor_r <= "00";
---	
---	go_forward <= '0';
---	go_reverse <= '0';
---	go_left <= '0';
---	go_right <= '0';
-	
-	--go_forward <= GPIO_1(28);
-	--go_reverse <= GPIO_1(29);
-	--go_left <= GPIO_1(30);
-	--go_right <= GPIO_1(31);
 	go_forward <= SW(0);
 	go_reverse <= SW(1);
 	go_left <= SW(2);
 	go_right <= SW(3);
-	
 	
 	GPIO_1(35 downto 34) <= motor_l;
 	GPIO_1(33 downto 32) <= motor_r;
@@ -69,13 +54,6 @@ begin
 		end if;
 	end process;
 end rtl;
-
-
-
-
-
-
-
 
 
 --begin
