@@ -18,10 +18,14 @@ architecture behavioural of imageProcessing is
 	type data is array(239 downto 0) of pixel_colour;
 	
 	signal image_data : data;
+	signal PIXEL_DATA_ROW : pixel_colour;
+	signal PIXEL_DATA : std_logic_vector(23 downto 0);
+	
 	signal store_pixel : std_logic;
 	signal store_done : std_logic;
-	signal PIXEL_DATA : std_logic_vector(23 downto 0);
-	signal PIXEL_DATA_ROW : pixel_colour;
+	
+	signal PIXEL_DISPLAY_ROW : pixel_colour;
+	signal PIXEL_DISPLAY : std_logic_vector(23 downto 0);
 begin
 	PROCESS(CLOCK_50, KEY(0))
 		type state is (initialize, read_red, read_green, read_blue, store, display, idle);
@@ -56,8 +60,11 @@ begin
 						CURRENT_STATE := display;
 					END IF;
 				WHEN display =>
-					LEDR(15 downto 0) <= current_pixel(23 downto 8);
-					LEDG(7 downto 0) <= current_pixel(7 downto 0);
+					PIXEL_DISPLAY_ROW <= image_data(120);
+					PIXEL_DISPLAY <= PIXEL_DISPLAY_ROW(160);
+					
+					LEDR(15 downto 0) <= PIXEL_DISPLAY(23 downto 8);
+					LEDG(7 downto 0) <= PIXEL_DISPLAY(7 downto 0);
 					CURRENT_STATE := idle;
 				WHEN others =>
 					IF(KEY(0) = '0') THEN
