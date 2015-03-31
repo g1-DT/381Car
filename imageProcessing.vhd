@@ -7,7 +7,7 @@ entity imageProcessing is
 		 CLOCK_50            : in  std_logic;
 		 KEY                 : in  std_logic_vector(3 downto 0);
 		 SW                  : in  std_logic_vector(17 downto 0);
-		 COLOUR_BYTE			: in  std_logic_vector(7 downto 0); --reading in R, G, B one byte at a time
+--		 COLOUR_BYTE			: in  std_logic_vector(7 downto 0); --reading in R, G, B one byte at a time
 		 LEDR						: out std_logic_vector(17 downto 0);
 		 LEDG						: out std_logic_vector(7 downto 0)
 	 );
@@ -27,6 +27,8 @@ begin
 		type state is (initialize, read_red, read_green, read_blue, store, display, idle);
 		variable CURRENT_STATE : state := initialize;
 		variable current_pixel : std_logic_vector(23 downto 0) := (others => '0');
+		
+		variable COLOUR_BYTE : std_logic_vector(7 downto 0) := (others => '0'); --testing
 	BEGIN
 		IF(RISING_EDGE(CLOCK_50)) THEN
 			CASE CURRENT_STATE IS
@@ -35,12 +37,15 @@ begin
 					LEDR(17 downto 0) <= (others => '0');
 					CURRENT_STATE := read_red;
 				WHEN read_red =>
+					COLOUR_BYTE := SW(7 downto 0); --testing
 					current_pixel(23 downto 16) := COLOUR_BYTE;
 					CURRENT_STATE := read_green;
 				WHEN read_green =>
+					COLOUR_BYTE := SW(7 downto 0); --testing
 					current_pixel(15 downto 8) := COLOUR_BYTE;
 					CURRENT_STATE := read_blue;
 				WHEN read_blue =>
+					COLOUR_BYTE := SW(7 downto 0); --testing
 					current_pixel(7 downto 0) := COLOUR_BYTE;
 					STORE_PIXEL <= '1';
 					CURRENT_STATE := store;
