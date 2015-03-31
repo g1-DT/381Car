@@ -85,10 +85,12 @@ begin
 				IF(x_coord < 240 ) THEN
 					image_column := image_data(x_coord);
 					IF(y_coord < 320) THEN
-						PIXEL_DATA_ROW(y_coord) <= PIXEL_DATA;
+						image_column(y_coord) :=  PIXEL_DATA;
+--						PIXEL_DATA_ROW(y_coord) <= image_column(y_coord);
 						y_coord := y_coord + 1;
 					ELSE
-						image_data(x_coord) <= PIXEL_DATA_ROW;
+--						image_data(x_coord) <= PIXEL_DATA_ROW;
+						image_data(x_coord) <= image_column;
 						x_coord := x_coord + 1;
 						y_coord := 0;
 					END IF;
