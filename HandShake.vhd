@@ -18,9 +18,13 @@ architecture rtl of HandShake is
 	signal writebits : std_logic;
 	signal readbits : std_logic;	
 	signal ready : std_logic;
+	signal pi_ready : std_logic;
+	signal de2_ackno : std_logic;
 begin
 
 	GPIO_1(10) <= ready;
+	pi_ready <= GPIO_1(13);
+	GPIO_1(12) <= de2_ackno;
 	
 	--DATAPATH
 	process (CLOCK_50)
@@ -62,7 +66,7 @@ begin
 				 writebits <= '0';
 				 ackno := '0';
 				 ready <= '1';
-				 GPIO_1(12) <= '0';
+				 DE2_ackno <= '0';
 				 next_state := idleState;
 				 LEDR(3 downto 0) <= "0000";
 				--Wait for acknowledge signal to know when data is in the GPIO, if acknowledge is set then go to ready state
@@ -120,7 +124,7 @@ begin
 					 if(done = '1') then
 						LEDR(3 downto 0) <= "1000";
 						writebits <= '0';
-						GPIO_1(12) <= '1';
+						DE2_ackno <= '1';
 						next_state := waitState;
 					 else
 						LEDR(3 downto 0) <= "0111";
@@ -130,7 +134,7 @@ begin
 						next_state := writeState;
 					 end if;
 				  when waitState => --wait until the ready is set to 0
-					 if(GPIO_1(13) = '0') then
+					 if(pi_ready = '0') then
 						LEDR(3 downto 0) <= "1001";
 						next_state := signalState;
 					 else
@@ -138,9 +142,9 @@ begin
 						next_state := waitState;
 					 end if;
 				  when others =>
-						if(GPIO_1(13) = '1') then
+						if(pi_ready = '1') then
 							LEDR(3 downto 0) <= "0000";
-							GPIO_1(12) <= '0';
+							DE2_ackno <= '0';
 							next_state := readyState;	
 						else
 							LEDR(3 downto 0) <= "1001";
