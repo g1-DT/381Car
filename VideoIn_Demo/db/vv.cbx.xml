@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<LOG_ROOT>
+	<PROJECT NAME="vv">
+		<CBX_INST_ENTRY INSTANCE_NAME="|vv|Video_In:vin|Altera_UP_Video_In_Deinterlacer:Video_In_Deinterlacer|Video_In_FIFO:Video_In_FIFO|scfifo:scfifo_component" CBX_FILE_NAME="scfifo_tb31.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|vv|Video_In:vin|Altera_UP_YCrCb_to_RGB_Converter:YCrCb_to_RGB_Converter|lpm_mult:lpm_mult_component_1" CBX_FILE_NAME="mult_rpq.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|vv|Video_In:vin|Altera_UP_YCrCb_to_RGB_Converter:YCrCb_to_RGB_Converter|lpm_mult:lpm_mult_component_3" CBX_FILE_NAME="mult_rpq.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|vv|vga_adapter:VGA|altsyncram:VideoMemory" CBX_FILE_NAME="altsyncram_ddg1.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|vv|Video_In:vin|Altera_UP_Video_In_Buffer:Video_In_Data_Buffer|Dual_Clock_FIFO:Video_In_Buffer|dcfifo:dcfifo_component" CBX_FILE_NAME="dcfifo_fje1.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|vv|Video_In:vin|Altera_UP_YCrCb_to_RGB_Converter:YCrCb_to_RGB_Converter|lpm_mult:lpm_mult_component_0" CBX_FILE_NAME="mult_rpq.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|vv|Video_In:vin|Altera_UP_YCrCb_to_RGB_Converter:YCrCb_to_RGB_Converter|lpm_mult:lpm_mult_component_2" CBX_FILE_NAME="mult_rpq.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|vv|Video_In:vin|Altera_UP_YCrCb_to_RGB_Converter:YCrCb_to_RGB_Converter|lpm_mult:lpm_mult_component_4" CBX_FILE_NAME="mult_rpq.tdf"/>
+	</PROJECT>
+</LOG_ROOT>

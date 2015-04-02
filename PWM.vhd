@@ -6,62 +6,127 @@ entity PWM is
   port(CLOCK_50            : in  std_logic;
        SW                  : in  std_logic_vector(17 downto 0);
 		 GPIO_1					: inout std_logic_vector(35 downto 0);
-		 --7 downto 4 output to PWM
-		 --3 downto 0 input from pi
+		 --35 downto 32 output to PWM
+		 --31 downto 28 input from pi
 		 LEDG : out std_logic_vector(7 downto 0));
 end PWM;
 
 architecture rtl of PWM is
-signal pwmLimit : integer <= '0';
-signal motor_l, motor_r : std_logic_vector(1 downto 0) <= "00";
-signal go_forward, go_reverse, go_left, go_right : std_logic <= '0';
+signal motor_l, motor_r : std_logic_vector(1 downto 0);
+signal go_forward, go_reverse, go_left, go_right : std_logic;
+signal motor_L1,motor_L2,motor_R1,motor_R2 : std_logic;
+signal reset : std_logic;
+
+component servo_pwm  
+		Port ( clk      : in  STD_LOGIC;
+             reset    : in  STD_LOGIC; 
+             button_l : in  STD_LOGIC;  
+             button_r : in  STD_LOGIC; 
+             pwm      : out  STD_LOGIC);
+end component;
+
 begin
-
-	go_forward <= GPIO_1(0);
-	go_reverse <= GPIO_1(1);
-	go_left <= GPIO_1(2);
-	go_right <= GPIO(3);
+	servoL_1 : servo_pwm port map(
+			clk=>CLOCK_50,
+			reset=>reset,
+			button_l=>SW(16),
+			button_r=>motor_L1,
+			pwm=>GPIO_1(34)
+			);
+	servoL_2 : servo_pwm port map(
+			clk=>CLOCK_50,
+			reset=>reset,
+			button_l=>SW(16),
+			button_r=>motor_L2,
+			pwm=>GPIO_1(35)
+			);
+	servoR_1 : servo_pwm port map(
+			clk=>CLOCK_50,
+			reset=>reset,
+			button_l=>SW(16),
+			button_r=>motor_R1,
+			pwm=>GPIO_1(32)
+			);
+	servoR_2 : servo_pwm port map(
+			clk=>CLOCK_50,
+			reset=>reset,
+			button_l=>SW(16),
+			button_r=>motor_R2,
+			pwm=>GPIO_1(33)
+			);
 	
-	GPIO_1(7 downto 6) <= motor_l;
-	GPIO_1(5 downto 4) <= motor_r;
 
-  process (CLOCK_50, SW)
-	variable pwmcount : integer := 0;
-	variable PWM0val : std_logic := '0';
-	variable dec : integer := 0;
-	variable count : integer := 1;
+	--currently using controls from the Pi
+	--go_forward <= GPIO_1(28);
+	go_forward <= SW(0);
+	--go_reverse <= GPIO_1(29);
+	go_reverse <= SW(1);
+	--go_left <= GPIO_1(30);
+	go_left <= SW(2);
+	--go_right <= GPIO_1(31);
+	go_right <= SW(3);
+	
+	--output to the DC motors
+	--GPIO_1(35 downto 34) <= motor_l;
+	--GPIO_1(33 downto 32) <= motor_r;
+
+  process (CLOCK_50)
   begin
 		if(rising_edge(CLOCK_50)) then
 			if(go_forward = '1') then
-				motor_l <= "01";
-				motor_r <= "01";
+				LEDG(2 downto 0)<="101";
+				reset<='0';
+				motor_L1<='1';
+				motor_L2<='0';
+				motor_R1<='1';
+				motor_R2<='0';
+				--motor_l <= "01";
+				--motor_r <= "01";
 			elsif(go_reverse = '1') then
-				motor_l <= "10";
-				motor_r <= "10";
+				LEDG(2 downto 0)<="001";
+				reset<='0';
+				motor_L1<='0';
+				motor_L2<='1';
+				motor_R1<='0';
+				motor_R2<='1';
+				--motor_l <= "10";
+				--motor_r <= "10";
 			elsif(go_left = '1') then
-				motor_l <= "00";
-				motor_r <= "01";
+				LEDG(2 downto 0)<="010";
+				reset<='0';
+				motor_L1<='0';
+				motor_L2<='0';
+				motor_R1<='1';
+				motor_R2<='0';
+				--motor_l <= "00";
+				--motor_r <= "01";
 			elsif(go_right = '1') then
-				motor_l <= "01";
-				motor_r <= "00";
+				LEDG(2 downto 0)<="100";
+				reset<='0';
+				motor_L1<='1';
+				motor_L2<='0';
+				motor_R1<='0';
+				motor_R2<='0';
+				--motor_l <= "01";
+				--motor_r <= "00";
 			else
-				motor_l <= "00";
-				motor_r <= "00";
+				LEDG(2 downto 0)<="111";
+				reset<='1';
+				motor_L1<='0';
+				motor_L2<='0';
+				motor_R1<='0';
+				motor_R2<='0';
+				--motor_l <= "00";
+				--motor_r <= "00";
+				
 			end if;
 		end if;
 	end process;
 end rtl;
 
 
-
-
-
-
-
-
-
 --begin
---  process (CLOCK_50, SW)
+-- process (CLOCK_50, SW)
 --	variable pwmcount : integer := 0;
 --	variable PWM0val : std_logic := '0';
 --	variable dec : integer := 0;
