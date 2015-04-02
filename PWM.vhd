@@ -14,7 +14,23 @@ end PWM;
 architecture rtl of PWM is
 signal motor_l, motor_r : std_logic_vector(1 downto 0);
 signal go_forward, go_reverse, go_left, go_right : std_logic;
+
+component servo_pwm  
+		Port ( clk      : in  STD_LOGIC;
+             reset    : in  STD_LOGIC; 
+             button_l : in  STD_LOGIC;  
+             button_r : in  STD_LOGIC; 
+             pwm      : out  STD_LOGIC);
+end component;
+
 begin
+	servo : servo_pwm port map(
+			clk=>CLOCK_50,
+			reset=>SW(17),
+			button_l=>SW(16),
+			button_r=>SW(15),
+			pwm=>GPIO_1(0));
+	
 
 	--currently using controls from the Pi
 	go_forward <= GPIO_1(28);
@@ -63,15 +79,8 @@ begin
 end rtl;
 
 
-
-
-
-
-
-
-
 --begin
---  process (CLOCK_50, SW)
+-- process (CLOCK_50, SW)
 --	variable pwmcount : integer := 0;
 --	variable PWM0val : std_logic := '0';
 --	variable dec : integer := 0;
