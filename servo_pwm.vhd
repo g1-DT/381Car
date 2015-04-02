@@ -12,9 +12,9 @@ entity servo_pwm is
 
 architecture Behavioral of servo_pwm is
       constant period:integer:=1000000;
-      constant dcycle_max:integer:=200000;
+      constant dcycle_max:integer:=300000;
       constant dcycle_min:integer:=100000;
-      constant duty_in:integer:=200;
+      constant duty_in:integer:=1000;
       signal pwm_reg,pwm_next:std_logic;
       signal duty_cycle,duty_cycle_next:integer:=0;
       signal counter,counter_next:integer:=0;
