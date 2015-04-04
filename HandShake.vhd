@@ -101,11 +101,13 @@ begin
 					if(done = '1') then
 						modifybits <= '0';
 						readbits <= '0';
+						ready <= '1';
 						LEDR(3 downto 0) <= "0100";
 						next_state := idleState2;
 					else
 						LEDR(3 downto 0) <= "0011";
 						modifybits <= '1';
+						ready <= '0';
 						readbits <= '0';
 						next_state := modifyState;
 					end if;
@@ -115,7 +117,6 @@ begin
 							next_State := writeState;
 						else
 							LEDR(3 downto 0) <= "0100";
-							ready <= '1';
 							modifybits <= '0';
 							readbits <= '0';
 							next_State := idleState2; --check for other conditions afterwards
