@@ -12,6 +12,7 @@ entity PWM is
 end PWM;
 
 architecture rtl of PWM is
+signal sensor1,sensor2,sensor3,sensor4 : std_logic;
 signal motor_l, motor_r : std_logic_vector(1 downto 0);
 signal go_forward, go_reverse, go_left, go_right : std_logic;
 signal motor_L1,motor_L2,motor_R1,motor_R2 : std_logic;
@@ -69,10 +70,31 @@ begin
 	--output to the DC motors
 	--GPIO_1(35 downto 34) <= motor_l;
 	--GPIO_1(33 downto 32) <= motor_r;
+	
+	sensor1 <= GPIO_1(0);
+	sensor2 <= GPIO_1(1);
+	sensor3 <= GPIO_1(2);
+	sensor4 <= GPIO_1(3);
+	
+--process(CLOCK_50)
+--begin
+--	if(rising_edge(CLOCK_50)) then
+--		if(sensor1 = '0') then
+--			LEDG(7)<='1';
+--			LEDG(6)<='0';
+--		else
+--			LEDG(6)<='1';
+--			LEDG(7)<='0';
+--		end if;
+--	end if;
+--end process;
 
-  process (CLOCK_50)
-  begin
-		if(rising_edge(CLOCK_50)) then
+process (CLOCK_50)
+begin
+	if(rising_edge(CLOCK_50)) then
+		if(sensor1 = '0' OR sensor2 = '0' OR sensor3 = '0' OR sensor4 = '0' ) then
+			reset<='1';
+		else
 			if(go_forward = '1') then
 				LEDG(2 downto 0)<="101";
 				reset<='0';
@@ -120,42 +142,7 @@ begin
 				--motor_r <= "00";
 				
 			end if;
-		end if;
-	end process;
+		end if;	
+	end if;
+end process;
 end rtl;
-
-
---begin
--- process (CLOCK_50, SW)
---	variable pwmcount : integer := 0;
---	variable PWM0val : std_logic := '0';
---	variable dec : integer := 0;
---	variable count : integer := 1;
---  begin
---		if(rising_edge(CLOCK_50)) then
---			pwmcount := pwmcount + 1;
---			if(pwmcount >= pwmLimit and PWM0val = '1') then
---				PWM0val := '0';
---				pwmcount := 0;
---				pwmLimit <= 15;
---				--GPIO_1(0) <= '0';
---			elsif(pwmcount >= pwmLimit and PWM0val = '0') then
---				PWM0val := '1';
---				pwmcount := 0;
---				pwmLimit <= 10;
---				GPIO_1(0) <= '1';
---			end if;
---	   end if;	
---		
---		if(SW(0) = '1') then
---			GPIO_1(3) <= '1';
---		else
---			GPIO_1(3) <= '0';
---		end if;
---		if(SW(1) = '1') then
---			GPIO_1(4) <= '1';
---		else
---			GPIO_1(4) <= '0';
---		end if;
---	end process;
---end rtl;
