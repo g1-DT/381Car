@@ -58,14 +58,14 @@ begin
 	
 
 	--currently using controls from the Pi
-	--go_forward <= GPIO_1(28);
-	go_forward <= SW(0);
-	--go_reverse <= GPIO_1(29);
-	go_reverse <= SW(1);
-	--go_left <= GPIO_1(30);
-	go_left <= SW(2);
-	--go_right <= GPIO_1(31);
-	go_right <= SW(3);
+	go_forward <= GPIO_1(28);
+	--go_forward <= SW(0);
+	go_reverse <= GPIO_1(29);
+	--go_reverse <= SW(1);
+	go_left <= GPIO_1(30);
+	--go_left <= SW(2);
+	go_right <= GPIO_1(31);
+	--go_right <= SW(3);
 	
 	--output to the DC motors
 	--GPIO_1(35 downto 34) <= motor_l;
