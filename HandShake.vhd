@@ -13,8 +13,11 @@ entity HandShake is
 end HandShake;
 
 architecture rtl of HandShake is
-	subtype pixel_colour is std_logic_vector(7 downto 0);
-	type colour_array is array(integer range 0 to 19, integer range 0 to 19) of pixel_colour;
+--	subtype pixel_colour is std_logic_vector(7 downto 0);
+--	type colour_array is array(integer range 0 to 19, integer range 0 to 19) of pixel_colour;
+
+	type colour_array is array(0 to 19, 0 to 19) of std_logic_vector(7 downto 0);
+
 	signal red_array : colour_array;
 	signal green_array : colour_array;
 	signal blue_array : colour_array;
