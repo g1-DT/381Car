@@ -89,7 +89,7 @@ begin
 					colour_type := red;
 					LEDR(17 downto 15) <= "001";
 				end if;
-				LEDG(7 downto 0) <= blue_array(0,9);
+				LEDG(7 downto 0) <= blue_array(1,9);
 				done <= '1';
 			end if;
 			
@@ -118,7 +118,7 @@ begin
   
 	--FINITE STATE MACHINE
 	process (CLOCK_50)
-		type state_type is (readyState, idleState, readState, modifyState, idleState2, idleState3, writeState, signalState, waitState, waitForAckno, waitForAckno2, resetVariables);
+		type state_type is (readyState, readyState2, waitForAckno3, waitForAckno4, readState2, idleState, readState, modifyState, idleState2, idleState3, writeState, signalState, waitState, waitForAckno, waitForAckno2, resetVariables);
 		variable count_p : integer := 0;
 		variable ackno : std_logic; --ackno used as an indicator from pi to DE2 that tells the DE2 to read data
 		variable present_state : state_type := idleState; --present_state represents the current state
@@ -188,7 +188,7 @@ begin
 					if(ackno = '0') then
 						readbits <= '0';
 						LEDR(3 downto 0) <= "1110";
-						next_state := idleState3;
+						next_state := readyState2;
 					else
 						readbits <= '0';
 						ackno := GPIO_1(11);
@@ -203,18 +203,74 @@ begin
 						resetVar <= '1';
 						next_state := resetVariables;
 					end if;
+				 when readyState2 => 
+					readBits <= '0';
+					modifybits <= '0';
+					writebits <= '0';
+					ackno := '0';
+					ready <= '1';
+					DE2_ackno <= '0';
+					next_state := idleState3;
+					LEDR(3 downto 0) <= "0000";
 				 when idleState3 =>
 				  if(ackno = '1') then
 					LEDR(3 downto 0) <= "0010";
 					ready <= '0';
 					readbits <= '1';
-					next_state := modifyState;
+					next_state := readState2;
 				  else
 					readbits <= '0';
 					ackno := GPIO_1(11);
 					LEDR(3 downto 0) <= "0111";
 					next_state := idleState3;
 				 end if;
+				--Tell datapath to read bits in input GPIO until done signal is set
+				when readState2 =>
+				 --DE2 is done reading
+				 if(count_p = 29) then
+					ready <= '1';
+					readbits <= '0';
+					count_p := 0;
+					next_state := waitForAckno3;
+				 elsif(done = '1') then
+					ready <= '1';
+					count_p := count_p + 1;
+					LEDR(3 downto 0) <= "0011";
+					readbits <= '0';
+					modifybits <= '1';
+					next_state := waitForAckno4;
+			    --Set Datapath to read bits in GPIO
+				 else
+					ready <= '0';
+					readbits <= '0';
+					modifybits <= '0';
+					LEDR(3 downto 0) <= "1000";
+					next_state := readState2;
+				 end if;
+				 --confirm the acknowledge is back to 0
+				 when waitForAckno3 =>
+					if(ackno = '0') then
+						readbits <= '0';
+						LEDR(3 downto 0) <= "1110";
+						next_state := modifyState;
+					else
+						readbits <= '0';
+						ackno := GPIO_1(11);
+						LEDR(3 downto 0) <= "1110";
+						next_state := waitForAckno3;
+					end if;
+				 when waitForAckno4 =>
+					if(ackno = '0') then
+						readbits <= '0';
+						LEDR(3 downto 0) <= "1110";
+						next_state := readyState2;
+					else
+						readbits <= '0';
+						ackno := GPIO_1(11);
+						LEDR(3 downto 0) <= "1110";
+						next_state := waitForAckno4;
+					end if;
+				 --confirm the acknowledge is back to 0
 				 --Tell datapath to modify bits that were stored in a signal
 				 when modifyState =>
 					--DE2 done modifying the signal, transition to writeState
