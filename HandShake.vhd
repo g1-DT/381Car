@@ -13,14 +13,6 @@ entity HandShake is
 end HandShake;
 
 architecture rtl of HandShake is
---	subtype pixel_colour is std_logic_vector(7 downto 0);
---	type colour_array is array(integer range 0 to 19, integer range 0 to 19) of pixel_colour;
-
-	type colour_array is array(0 to 19, 0 to 19) of std_logic_vector(7 downto 0);
-
-	signal red_array : colour_array;
-	signal green_array : colour_array;
-	signal blue_array : colour_array;
 	signal done : std_logic;
 	signal modifybits : std_logic;
 	signal writebits : std_logic;
@@ -37,6 +29,11 @@ begin
 	
 	--DATAPATH
 	process (CLOCK_50)
+		subtype pixel_colour is std_logic_vector(7 downto 0);
+		type colour_array is array(integer range 0 to 2, integer range 0 to 9) of pixel_colour;
+		variable red_array : colour_array;
+		variable green_array : colour_array;
+		variable blue_array : colour_array;
 		type store_type is (red, green, blue);
 		variable readData : std_logic_vector(7 downto 0) := "00000000";
 		variable modifiedData : std_logic_vector(7 downto 0) := "00000000";
@@ -53,102 +50,60 @@ begin
 			done <= '0';
 			if(readbits = '1') then
 				if(colour_type = red) then
-					red_array(r_y,r_x) <= readData(7 downto 0);
-					if(r_x = 19	and r_y = 19) then
+					red_array(r_y,r_x) := readData(7 downto 0);
+					if(r_x = 9 and r_y = 9) then
 						r_y := 0;
 						r_x := 0;
-					elsif(r_x = 19) then
+					elsif(r_x = 9) then
 						r_x := 0;
 						r_y := r_y + 1;
 					else
 						r_x := r_x + 1;
 					end if;
 					colour_type := green;
-					--LEDR(17 downto 15) <= "100";
+					LEDR(17 downto 15) <= "100";
 				elsif(colour_type = green) then
-					green_array(g_y,g_x) <= readData(7 downto 0);
-					if(g_x = 19 and g_y = 19) then
+					green_array(g_y,g_x) := readData(7 downto 0);
+					if(g_x = 9 and g_y = 9) then
 						g_y := 0;
 						g_x := 0;
-					elsif(g_x = 19) then
+					elsif(g_x = 9) then
 						g_x := 0;
 						g_y := g_y + 1;
 					else
 						g_x := g_x + 1;
 					end if;
 					colour_type := blue;
-					--LEDR(17 downto 15) <= "010";
+					LEDR(17 downto 15) <= "010";
 				else
-					blue_array(b_y,b_x) <= readData(7 downto 0);
-					if(b_x = 19 and b_y = 19) then
+					blue_array(b_y,b_x) := readData(7 downto 0);
+					if(b_x = 9 and b_y = 9) then
 						b_y := 0;
 						b_x := 0;
-					elsif(b_x = 19) then
+					elsif(b_x = 9) then
 						b_x := 0;
 						b_y := b_y + 1;
 					else
 						b_x := b_x + 1;
 					end if;
 					colour_type := red;
-					--LEDR(17 downto 15) <= "001";
+					LEDR(17 downto 15) <= "001";
 				end if;
-				LEDG(7 downto 0) <= green_array(19,19);
+				LEDG(7 downto 0) <= blue_array(0,9);
 				done <= '1';
 			end if;
 			
 			if(modifybits = '1') then
-				
+			
 				done <= '1';
 			end if;
 			
 			if(writebits = '1') then
-				--GPIO_0(7 downto 0) <= modifiedData(7 downto 0);
-				if(colour_type = red) then
-					modifiedData(7 downto 0):= red_array(r_y,r_x);
-					if(r_x = 19 and r_y = 19) then
-						r_y := 0;
-						r_x := 0;
-					elsif(r_x = 19) then
-						r_x := 0;
-						r_y := r_y + 1;
-					else
-						r_x := r_x + 1;
-					end if;
-					colour_type := green;
-					--LEDR(17 downto 15) <= "100";
-				elsif(colour_type = green) then
-					modifiedData(7 downto 0):= green_array(g_y,g_x);
-					if(g_x = 19 and g_y = 19) then
-						g_y := 0;
-						g_x := 0;
-					elsif(g_x = 19) then
-						g_x := 0;
-						g_y := g_y + 1;
-					else
-						g_x := g_x + 1;
-					end if;
-					colour_type := blue;
-					--LEDR(17 downto 15) <= "010";
-				else
-					modifiedData(7 downto 0):= blue_array(b_y,b_x);
-					if(b_x = 19 and b_y = 19) then
-						b_y := 0;
-						b_x := 0;
-					elsif(b_x = 19) then
-						b_x := 0;
-						b_y := b_y + 1;
-					else
-						b_x := b_x + 1;
-					end if;
-					colour_type := red;
-					--LEDR(17 downto 15) <= "001";
-				end if;
-				GPIO_0(7 downto 0) <= modifiedData(7 downto 0);
+				GPIO_0(7 downto 0) <= green_array(0,9);
 				done <= '1';
 			end if;
 			
 			if(resetVar = '1') then
-				colour_type := red;
 				r_y := 0;
 				r_x := 0;
 				g_y := 0;
@@ -197,7 +152,7 @@ begin
 				--Tell datapath to read bits in input GPIO until done signal is set
 				when readState =>
 				 --DE2 is done reading
-				 if(count_p = 1199) then
+				 if(count_p = 29) then
 					ready <= '1';
 					readbits <= '0';
 					count_p := 0;
@@ -241,22 +196,7 @@ begin
 				 when modifyState =>
 					--DE2 done modifying the signal, transition to writeState
 					--TODO: do something cool in this state to modify bits
-					if(count_p = 1199) then
-						next_state := idleState2;
-						modifybits <= '0';
-						readbits <= '0';
-					elsif(done = '1') then
-						count_p := count_p + 1;
-						modifybits <= '0';
-						readbits <= '0';
-						LEDR(3 downto 0) <= "0100";
-						next_state := idleState2;
-					else
-						LEDR(3 downto 0) <= "0011";
-						modifybits <= '1';
-						readbits <= '0';
-						next_state := modifyState;
-					end if;
+					next_state := idleState2;
 				  when idleState2 =>
 						if(GPIO_1(13) = '1') then
 							LEDR(3 downto 0) <= "1000";
@@ -268,24 +208,11 @@ begin
 							next_State := idleState2; --check for other conditions afterwards
 						end if;
 				  when writeState =>
-					if(count_p = 1199) then
-						next_state := readyState;
-						writebits <= '0';
-						modifybits <= '0';
-						readbits <= '0';
-					elsif(done = '1') then
-						count_p := count_p + 1;
-						writebits <= '1';
-						modifybits <= '0';
-						readbits <= '0';
-						DE2_ackno <= '1';
+					 if(done = '1') then
 						LEDR(3 downto 0) <= "1000";
+						writebits <= '0';
+						DE2_ackno <= '1';
 						next_state := waitState;
---					 if(done = '1') then
---						LEDR(3 downto 0) <= "1000";
---						writebits <= '0';
---						DE2_ackno <= '1';
---						next_state := waitState;
 					 else
 						LEDR(3 downto 0) <= "0111";
 						readbits <= '0';
