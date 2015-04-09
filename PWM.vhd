@@ -4,11 +4,8 @@ use ieee.numeric_std.all;
 
 entity PWM is
   port(CLOCK_50            : in  std_logic;
-       SW                  : in  std_logic;
+       SW                  : in  std_logic_vector(17 downto 0);
 		 GPIO_1					: inout std_logic_vector(35 downto 24));
-		 --35 downto 32 output to PWM
-		 --31 downto 28 input from pi
-		 --LEDG : out std_logic_vector(7 downto 0));
 end PWM;
 
 architecture rtl of PWM is
@@ -30,28 +27,28 @@ begin
 	servoL_1 : servo_pwm port map(
 			clk=>CLOCK_50,
 			reset=>NOT motor_L1,
-			button_l=>SW,
+			button_l=>SW(16),
 			button_r=>motor_L1,
 			pwm=>GPIO_1(34)
 			);
 	servoL_2 : servo_pwm port map(
 			clk=>CLOCK_50,
 			reset=>NOT motor_L2,
-			button_l=>SW,
+			button_l=>SW(16),
 			button_r=>motor_L2,
 			pwm=>GPIO_1(35)
 			);
 	servoR_1 : servo_pwm port map(
 			clk=>CLOCK_50,
 			reset=>NOT motor_R1,
-			button_l=>SW,
+			button_l=>SW(16),
 			button_r=>motor_R1,
 			pwm=>GPIO_1(32)
 			);
 	servoR_2 : servo_pwm port map(
 			clk=>CLOCK_50,
 			reset=>NOT motor_R2,
-			button_l=>SW,
+			button_l=>SW(16),
 			button_r=>motor_R2,
 			pwm=>GPIO_1(33)
 			);
@@ -67,84 +64,39 @@ begin
 	go_right <= GPIO_1(31);
 	--go_right <= SW(3);
 	
-	--output to the DC motors
-	--GPIO_1(35 downto 34) <= motor_l;
-	--GPIO_1(33 downto 32) <= motor_r;
-	
 	sensor1 <= GPIO_1(24);
 	sensor2 <= GPIO_1(25);
 	sensor3 <= GPIO_1(26);
 	sensor4 <= GPIO_1(27);
-	
---process(CLOCK_50)
---begin
---	if(rising_edge(CLOCK_50)) then
---		if(sensor1 = '0') then
---			LEDG(7)<='1';
---			LEDG(6)<='0';
---		else
---			LEDG(6)<='1';
---			LEDG(7)<='0';
---		end if;
---	end if;
---end process;
 
 process (CLOCK_50)
 begin
 	if(rising_edge(CLOCK_50)) then
---		if(sensor1 = '0' OR sensor2 = '0' OR sensor3 = '0' OR sensor4 = '0' ) then
---				motor_L1<='0';
---				motor_L2<='0';
---				motor_R1<='0';
---				motor_R2<='0';
---		else
--- sensor1 =back, sensor2
 			if(go_left = '1' AND sensor2 = '1') then
-				--LEDG(2 downto 0)<="010";
-				--reset<='0';
 				motor_L1<='0';
 				motor_L2<='1';
 				motor_R1<='1';
 				motor_R2<='0';
-				--motor_l <= "00";
-				--motor_r <= "01";
 			elsif(go_right = '1' AND sensor3 = '1') then
-				--LEDG(2 downto 0)<="100";
-				--reset<='0';
 				motor_L1<='1';
 				motor_L2<='0';
 				motor_R1<='0';
 				motor_R2<='1';
-				--motor_l <= "01";
-				--motor_r <= "00";
 			elsif(go_forward = '1' AND sensor4 = '1') then
-				--LEDG(2 downto 0)<="101";
-				--reset<='0';
 				motor_L1<='1';
 				motor_L2<='0';
 				motor_R1<='1';
 				motor_R2<='0';
-				--motor_l <= "01";
-				--motor_r <= "01";
 			elsif(go_reverse = '1' AND sensor1 = '1') then
-				--LEDG(2 downto 0)<="001";
-				--reset<='0';
 				motor_L1<='0';
 				motor_L2<='1';
 				motor_R1<='0';
 				motor_R2<='1';
-				--motor_l <= "10";
-				--motor_r <= "10";
 			else
-				--LEDG(2 downto 0)<="111";
-				--reset<='1';
 				motor_L1<='0';
 				motor_L2<='0';
 				motor_R1<='0';
 				motor_R2<='0';
-				--motor_l <= "00";
-				--motor_r <= "00";
-				
 			end if;	
 	end if;
 end process;

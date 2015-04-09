@@ -20,24 +20,8 @@ architecture rtl of HandShake is
 	signal ready : std_logic;
 	signal pi_ready : std_logic;
 	signal de2_ackno : std_logic;
-	
-	component PWM Port(
-		 CLOCK_50            : in  std_logic;
-       SW                  : in  std_logic;
-		 GPIO_1					: inout std_logic_vector(35 downto 24));
-		 --35 downto 32 output to PWM
-		 --31 downto 28 input from pi
-		 --LEDG : out std_logic_vector(7 downto 0));
-		end component;
-	
 begin
 
---	PWM_1 : PWM port map(
---		CLOCK_50=>CLOCK_50,
---		SW=>SW(16),
---		GPIO_1=>GPIO_0(35 downto 24)
---	);
-	
 	GPIO_1(10) <= ready;
 	pi_ready <= GPIO_1(13);
 	GPIO_1(12) <= de2_ackno;
