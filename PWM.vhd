@@ -5,10 +5,10 @@ use ieee.numeric_std.all;
 entity PWM is
   port(CLOCK_50            : in  std_logic;
        SW                  : in  std_logic_vector(17 downto 0);
-		 GPIO_1					: inout std_logic_vector(35 downto 0);
+		 GPIO_1					: inout std_logic_vector(35 downto 0));
 		 --35 downto 32 output to PWM
 		 --31 downto 28 input from pi
-		 LEDG : out std_logic_vector(7 downto 0));
+		 --LEDG : out std_logic_vector(7 downto 0));
 end PWM;
 
 architecture rtl of PWM is
@@ -58,14 +58,14 @@ begin
 	
 
 	--currently using controls from the Pi
-	--go_forward <= GPIO_1(28);
-	go_forward <= SW(0);
-	--go_reverse <= GPIO_1(29);
-	go_reverse <= SW(1);
-	--go_left <= GPIO_1(30);
-	go_left <= SW(2);
-	--go_right <= GPIO_1(31);
-	go_right <= SW(3);
+	go_forward <= GPIO_1(28);
+	--go_forward <= SW(0);
+	go_reverse <= GPIO_1(29);
+	--go_reverse <= SW(1);
+	go_left <= GPIO_1(30);
+	--go_left <= SW(2);
+	go_right <= GPIO_1(31);
+	--go_right <= SW(3);
 	
 	--output to the DC motors
 	--GPIO_1(35 downto 34) <= motor_l;
@@ -91,15 +91,18 @@ begin
 
 process (CLOCK_50)
 begin
-	if(rising_edge(CLOCK_50)) then
-		if(sensor1 = '0' OR sensor2 = '0' OR sensor3 = '0' OR sensor4 = '0' ) then
-				motor_L1<='0';
-				motor_L2<='0';
-				motor_R1<='0';
-				motor_R2<='0';
-		else
-			if(go_left = '1') then
-				LEDG(2 downto 0)<="010";
+	if(rising_edge(CLOCK_50)) then	
+--		if(sensor1 = '0' OR sensor2 = '0' OR sensor3 = '0' OR sensor4 = '0' ) then
+--				motor_L1<='0';
+--				motor_L2<='0';
+--				motor_R1<='0';
+--				motor_R2<='0';
+--		end if;
+		
+		--sensor1 = back, sensor2 = left, sensor3 = right, sensor4 = front
+		
+			if(go_left = '1' AND sensor2 = '1') then
+				--LEDG(2 downto 0)<="010";
 				--reset<='0';
 				motor_L1<='0';
 				motor_L2<='1';
@@ -107,8 +110,8 @@ begin
 				motor_R2<='0';
 				--motor_l <= "00";
 				--motor_r <= "01";
-			elsif(go_right = '1') then
-				LEDG(2 downto 0)<="100";
+			elsif(go_right = '1' AND sensor3 = '1') then
+				--LEDG(2 downto 0)<="100";
 				--reset<='0';
 				motor_L1<='1';
 				motor_L2<='0';
@@ -116,8 +119,8 @@ begin
 				motor_R2<='1';
 				--motor_l <= "01";
 				--motor_r <= "00";
-			elsif(go_forward = '1') then
-				LEDG(2 downto 0)<="101";
+			elsif(go_forward = '1' AND sensor4 = '1') then
+				--LEDG(2 downto 0)<="101";
 				--reset<='0';
 				motor_L1<='1';
 				motor_L2<='0';
@@ -125,8 +128,8 @@ begin
 				motor_R2<='0';
 				--motor_l <= "01";
 				--motor_r <= "01";
-			elsif(go_reverse = '1') then
-				LEDG(2 downto 0)<="001";
+			elsif(go_reverse = '1' AND sensor1 = '1') then
+				--LEDG(2 downto 0)<="001";
 				--reset<='0';
 				motor_L1<='0';
 				motor_L2<='1';
@@ -135,7 +138,7 @@ begin
 				--motor_l <= "10";
 				--motor_r <= "10";
 			else
-				LEDG(2 downto 0)<="111";
+				--LEDG(2 downto 0)<="111";
 				--reset<='1';
 				motor_L1<='0';
 				motor_L2<='0';
@@ -144,8 +147,7 @@ begin
 				--motor_l <= "00";
 				--motor_r <= "00";
 				
-			end if;
-		end if;	
+			end if;	
 	end if;
 end process;
 end rtl;
