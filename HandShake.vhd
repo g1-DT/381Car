@@ -178,6 +178,7 @@ begin
 --					done <= '0';	
 --					mod_x := mod_x + 1;
 --				end if;
+				done <= '1';
 			end if;
 			
     		if(writebits = '1') then
