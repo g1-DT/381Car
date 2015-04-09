@@ -106,112 +106,112 @@ begin
 			end if;
 			
 			if(modifybits = '1') then
-				--Computes kernel depending on kernel mode
-				--if(GPIO_1(10) = '1') then
-					kernel(0,0) := 0;
-					kernel(0,1) := 0;
-					kernel(0,2) := 0;
-					kernel(1,0) := 0;
-					kernel(1,1) := 10;
-					kernel(1,2) := 5;
-					kernel(2,0) := 0;
-					kernel(2,1) := 5;
-					kernel(2,2) := 0;
-				
-				
-				r_sum := 0;
-				g_sum := 0;
-				b_sum := 0;
-				
-				--Compute 1 bit
-				if( NOT(mod_x = 0) AND NOT(mod_x = 9)) then
-					r_sum := r_sum + kernel(0,0) * to_integer(unsigned(red_array(r_y, mod_x - 1))) / 10 + kernel(0,1) * to_integer(unsigned(red_array(r_y, mod_x))) / 10+ kernel(0, 2) * to_integer(unsigned(red_array(r_y, mod_x + 1))) / 10;
-					r_sum := r_sum + kernel(1,0) * to_integer(unsigned(red_array((r_y + 1) mod 3, mod_x - 1))) / 10 + kernel(1,1) * to_integer(unsigned(red_array((r_y + 1) mod 3, mod_x))) / 10 + kernel(1, 2) * to_integer(unsigned(red_array((r_y + 1) mod 3, mod_x + 1))) / 10;
-					r_sum := r_sum + kernel(2,0) * to_integer(unsigned(red_array((r_y + 2) mod 3, mod_x - 1))) / 10 + kernel(2,1) * to_integer(unsigned(red_array((r_y + 2) mod 3, mod_x))) / 10 + kernel(2, 2) * to_integer(unsigned(red_array((r_y + 2) mod 3, mod_x + 1))) / 10;
-					
-					g_sum := g_sum + kernel(0,0) * to_integer(unsigned(green_array(r_y, mod_x - 1))) / 10 + kernel(0,1) * to_integer(unsigned(green_array(r_y, mod_x))) / 10+ kernel(0, 2) * to_integer(unsigned(green_array(r_y, mod_x + 1))) / 10;
-					g_sum := g_sum + kernel(1,0) * to_integer(unsigned(green_array((r_y + 1) mod 3, mod_x - 1))) / 10 + kernel(1,1) * to_integer(unsigned(green_array((r_y + 1) mod 3, mod_x))) / 10 + kernel(1, 2) * to_integer(unsigned(green_array((r_y + 1) mod 3, mod_x + 1))) / 10;
-					g_sum := g_sum + kernel(2,0) * to_integer(unsigned(green_array((r_y + 2) mod 3, mod_x - 1))) / 10 + kernel(2,1) * to_integer(unsigned(green_array((r_y + 2) mod 3, mod_x))) / 10 + kernel(2, 2) * to_integer(unsigned(green_array((r_y + 2) mod 3, mod_x + 1))) / 10;
-					
-					b_sum := b_sum + kernel(0,0) * to_integer(unsigned(blue_array(r_y, mod_x - 1))) / 10 + kernel(0,1) * to_integer(unsigned(blue_array(r_y, mod_x))) / 10+ kernel(0, 2) * to_integer(unsigned(blue_array(r_y, mod_x + 1))) / 10;
-					b_sum := b_sum + kernel(1,0) * to_integer(unsigned(blue_array((r_y + 1) mod 3, mod_x - 1))) / 10 + kernel(1,1) * to_integer(unsigned(blue_array((r_y + 1) mod 3, mod_x))) / 10 + kernel(1, 2) * to_integer(unsigned(blue_array((r_y + 1) mod 3, mod_x + 1))) / 10;
-					b_sum := b_sum + kernel(2,0) * to_integer(unsigned(blue_array((r_y + 2) mod 3, mod_x - 1))) / 10 + kernel(2,1) * to_integer(unsigned(blue_array((r_y + 2) mod 3, mod_x))) / 10 + kernel(2, 2) * to_integer(unsigned(blue_array((r_y + 2) mod 3, mod_x + 1))) / 10;
-				end if;
-				if( mod_x = 0) then
-					r_sum := r_sum + kernel(0,1) * to_integer(unsigned(red_array(r_y, mod_x))) / 10 + kernel(0, 2) * to_integer(unsigned(red_array(r_y, mod_x + 1))) / 10;
-					r_sum := r_sum + kernel(1,1) * to_integer(unsigned(red_array((r_y + 1) mod 3, mod_x))) / 10 + kernel(1, 2) * to_integer(unsigned(red_array((r_y + 1) mod 3, mod_x + 1))) / 10;
-					r_sum := r_sum + kernel(2,1) * to_integer(unsigned(red_array((r_y + 2) mod 3, mod_x))) / 10 + kernel(2, 2) * to_integer(unsigned(red_array((r_y + 2) mod 3, mod_x + 1))) / 10;
-					
-					g_sum := g_sum + kernel(0,1) * to_integer(unsigned(green_array(r_y, mod_x))) / 10+ kernel(0, 2) * to_integer(unsigned(green_array(r_y, mod_x + 1))) / 10;
-					g_sum := g_sum + kernel(1,1) * to_integer(unsigned(green_array((r_y + 1) mod 3, mod_x))) / 10 + kernel(1, 2) * to_integer(unsigned(green_array((r_y + 1) mod 3, mod_x + 1))) / 10;
-					g_sum := g_sum + kernel(2,1) * to_integer(unsigned(green_array((r_y + 2) mod 3, mod_x))) / 10 + kernel(2, 2) * to_integer(unsigned(green_array((r_y + 2) mod 3, mod_x + 1))) / 10;
-					
-					b_sum := b_sum + kernel(0,1) * to_integer(unsigned(blue_array(r_y, mod_x))) / 10 + kernel(0, 2) * to_integer(unsigned(blue_array(r_y, mod_x + 1))) / 10;
-					b_sum := b_sum + kernel(1,1) * to_integer(unsigned(blue_array((r_y + 1) mod 3, mod_x))) / 10 + kernel(1, 2) * to_integer(unsigned(blue_array((r_y + 1) mod 3, mod_x + 1))) / 10;
-					b_sum := b_sum + kernel(2,1) * to_integer(unsigned(blue_array((r_y + 2) mod 3, mod_x))) / 10 + kernel(2, 2) * to_integer(unsigned(blue_array((r_y + 2) mod 3, mod_x + 1))) / 10;
-				
-				end if;
-				if( mod_x = 9) then
-					r_sum := r_sum + kernel(0,0) * to_integer(unsigned(red_array(r_y, mod_x - 1))) / 10 + kernel(0,1) * to_integer(unsigned(red_array(r_y, mod_x))) / 10;
-					r_sum := r_sum + kernel(1,0) * to_integer(unsigned(red_array((r_y + 1) mod 3, mod_x - 1))) / 10 + kernel(1,1) * to_integer(unsigned(red_array((r_y + 1) mod 3, mod_x))) / 10;
-					r_sum := r_sum + kernel(2,0) * to_integer(unsigned(red_array((r_y + 2) mod 3, mod_x - 1))) / 10 + kernel(2,1) * to_integer(unsigned(red_array((r_y + 2) mod 3, mod_x))) / 10;
-					
-					g_sum := g_sum + kernel(0,0) * to_integer(unsigned(green_array(r_y, mod_x - 1))) / 10 + kernel(0,1) * to_integer(unsigned(green_array(r_y, mod_x))) / 10;
-					g_sum := g_sum + kernel(1,0) * to_integer(unsigned(green_array((r_y + 1) mod 3, mod_x - 1))) / 10 + kernel(1,1) * to_integer(unsigned(green_array((r_y + 1) mod 3, mod_x))) / 10;
-					g_sum := g_sum + kernel(2,0) * to_integer(unsigned(green_array((r_y + 2) mod 3, mod_x - 1))) / 10 + kernel(2,1) * to_integer(unsigned(green_array((r_y + 2) mod 3, mod_x))) / 10;
-					
-					b_sum := b_sum + kernel(0,0) * to_integer(unsigned(blue_array(r_y, mod_x - 1))) / 10 + kernel(0,1) * to_integer(unsigned(blue_array(r_y, mod_x))) / 10;
-					b_sum := b_sum + kernel(1,0) * to_integer(unsigned(blue_array((r_y + 1) mod 3, mod_x - 1))) / 10 + kernel(1,1) * to_integer(unsigned(blue_array((r_y + 1) mod 3, mod_x))) / 10;
-					b_sum := b_sum + kernel(2,0) * to_integer(unsigned(blue_array((r_y + 2) mod 3, mod_x - 1))) / 10 + kernel(2,1) * to_integer(unsigned(blue_array((r_y + 2) mod 3, mod_x))) / 10;
-				end if;
-				
-				mod_red(mod_x) := std_logic_vector(to_unsigned(r_sum, 8));
-				mod_green(mod_x) := std_logic_vector(to_unsigned(g_sum, 8));
-				mod_blue(mod_x) := std_logic_vector(to_unsigned(b_sum, 8));
-				
-				--LEDG(7 downto 0) <= mod_red(9);
-				
-				if(mod_x = 9) then
-					mod_x := 0;
-					done <= '1';
-				else
-					done <= '0';	
-					mod_x := mod_x + 1;
-				end if;
+--				--Computes kernel depending on kernel mode
+--				--if(GPIO_1(10) = '1') then
+--					kernel(0,0) := 0;
+--					kernel(0,1) := 0;
+--					kernel(0,2) := 0;
+--					kernel(1,0) := 0;
+--					kernel(1,1) := 10;
+--					kernel(1,2) := 5;
+--					kernel(2,0) := 0;
+--					kernel(2,1) := 5;
+--					kernel(2,2) := 0;
+--				
+--				
+--				r_sum := 0;
+--				g_sum := 0;
+--				b_sum := 0;
+--				
+--				--Compute 1 bit
+--				if( NOT(mod_x = 0) AND NOT(mod_x = 9)) then
+--					r_sum := r_sum + kernel(0,0) * to_integer(unsigned(red_array(r_y, mod_x - 1))) / 10 + kernel(0,1) * to_integer(unsigned(red_array(r_y, mod_x))) / 10+ kernel(0, 2) * to_integer(unsigned(red_array(r_y, mod_x + 1))) / 10;
+--					r_sum := r_sum + kernel(1,0) * to_integer(unsigned(red_array((r_y + 1) mod 3, mod_x - 1))) / 10 + kernel(1,1) * to_integer(unsigned(red_array((r_y + 1) mod 3, mod_x))) / 10 + kernel(1, 2) * to_integer(unsigned(red_array((r_y + 1) mod 3, mod_x + 1))) / 10;
+--					r_sum := r_sum + kernel(2,0) * to_integer(unsigned(red_array((r_y + 2) mod 3, mod_x - 1))) / 10 + kernel(2,1) * to_integer(unsigned(red_array((r_y + 2) mod 3, mod_x))) / 10 + kernel(2, 2) * to_integer(unsigned(red_array((r_y + 2) mod 3, mod_x + 1))) / 10;
+--					
+--					g_sum := g_sum + kernel(0,0) * to_integer(unsigned(green_array(r_y, mod_x - 1))) / 10 + kernel(0,1) * to_integer(unsigned(green_array(r_y, mod_x))) / 10+ kernel(0, 2) * to_integer(unsigned(green_array(r_y, mod_x + 1))) / 10;
+--					g_sum := g_sum + kernel(1,0) * to_integer(unsigned(green_array((r_y + 1) mod 3, mod_x - 1))) / 10 + kernel(1,1) * to_integer(unsigned(green_array((r_y + 1) mod 3, mod_x))) / 10 + kernel(1, 2) * to_integer(unsigned(green_array((r_y + 1) mod 3, mod_x + 1))) / 10;
+--					g_sum := g_sum + kernel(2,0) * to_integer(unsigned(green_array((r_y + 2) mod 3, mod_x - 1))) / 10 + kernel(2,1) * to_integer(unsigned(green_array((r_y + 2) mod 3, mod_x))) / 10 + kernel(2, 2) * to_integer(unsigned(green_array((r_y + 2) mod 3, mod_x + 1))) / 10;
+--					
+--					b_sum := b_sum + kernel(0,0) * to_integer(unsigned(blue_array(r_y, mod_x - 1))) / 10 + kernel(0,1) * to_integer(unsigned(blue_array(r_y, mod_x))) / 10+ kernel(0, 2) * to_integer(unsigned(blue_array(r_y, mod_x + 1))) / 10;
+--					b_sum := b_sum + kernel(1,0) * to_integer(unsigned(blue_array((r_y + 1) mod 3, mod_x - 1))) / 10 + kernel(1,1) * to_integer(unsigned(blue_array((r_y + 1) mod 3, mod_x))) / 10 + kernel(1, 2) * to_integer(unsigned(blue_array((r_y + 1) mod 3, mod_x + 1))) / 10;
+--					b_sum := b_sum + kernel(2,0) * to_integer(unsigned(blue_array((r_y + 2) mod 3, mod_x - 1))) / 10 + kernel(2,1) * to_integer(unsigned(blue_array((r_y + 2) mod 3, mod_x))) / 10 + kernel(2, 2) * to_integer(unsigned(blue_array((r_y + 2) mod 3, mod_x + 1))) / 10;
+--				end if;
+--				if( mod_x = 0) then
+--					r_sum := r_sum + kernel(0,1) * to_integer(unsigned(red_array(r_y, mod_x))) / 10 + kernel(0, 2) * to_integer(unsigned(red_array(r_y, mod_x + 1))) / 10;
+--					r_sum := r_sum + kernel(1,1) * to_integer(unsigned(red_array((r_y + 1) mod 3, mod_x))) / 10 + kernel(1, 2) * to_integer(unsigned(red_array((r_y + 1) mod 3, mod_x + 1))) / 10;
+--					r_sum := r_sum + kernel(2,1) * to_integer(unsigned(red_array((r_y + 2) mod 3, mod_x))) / 10 + kernel(2, 2) * to_integer(unsigned(red_array((r_y + 2) mod 3, mod_x + 1))) / 10;
+--					
+--					g_sum := g_sum + kernel(0,1) * to_integer(unsigned(green_array(r_y, mod_x))) / 10+ kernel(0, 2) * to_integer(unsigned(green_array(r_y, mod_x + 1))) / 10;
+--					g_sum := g_sum + kernel(1,1) * to_integer(unsigned(green_array((r_y + 1) mod 3, mod_x))) / 10 + kernel(1, 2) * to_integer(unsigned(green_array((r_y + 1) mod 3, mod_x + 1))) / 10;
+--					g_sum := g_sum + kernel(2,1) * to_integer(unsigned(green_array((r_y + 2) mod 3, mod_x))) / 10 + kernel(2, 2) * to_integer(unsigned(green_array((r_y + 2) mod 3, mod_x + 1))) / 10;
+--					
+--					b_sum := b_sum + kernel(0,1) * to_integer(unsigned(blue_array(r_y, mod_x))) / 10 + kernel(0, 2) * to_integer(unsigned(blue_array(r_y, mod_x + 1))) / 10;
+--					b_sum := b_sum + kernel(1,1) * to_integer(unsigned(blue_array((r_y + 1) mod 3, mod_x))) / 10 + kernel(1, 2) * to_integer(unsigned(blue_array((r_y + 1) mod 3, mod_x + 1))) / 10;
+--					b_sum := b_sum + kernel(2,1) * to_integer(unsigned(blue_array((r_y + 2) mod 3, mod_x))) / 10 + kernel(2, 2) * to_integer(unsigned(blue_array((r_y + 2) mod 3, mod_x + 1))) / 10;
+--				
+--				end if;
+--				if( mod_x = 9) then
+--					r_sum := r_sum + kernel(0,0) * to_integer(unsigned(red_array(r_y, mod_x - 1))) / 10 + kernel(0,1) * to_integer(unsigned(red_array(r_y, mod_x))) / 10;
+--					r_sum := r_sum + kernel(1,0) * to_integer(unsigned(red_array((r_y + 1) mod 3, mod_x - 1))) / 10 + kernel(1,1) * to_integer(unsigned(red_array((r_y + 1) mod 3, mod_x))) / 10;
+--					r_sum := r_sum + kernel(2,0) * to_integer(unsigned(red_array((r_y + 2) mod 3, mod_x - 1))) / 10 + kernel(2,1) * to_integer(unsigned(red_array((r_y + 2) mod 3, mod_x))) / 10;
+--					
+--					g_sum := g_sum + kernel(0,0) * to_integer(unsigned(green_array(r_y, mod_x - 1))) / 10 + kernel(0,1) * to_integer(unsigned(green_array(r_y, mod_x))) / 10;
+--					g_sum := g_sum + kernel(1,0) * to_integer(unsigned(green_array((r_y + 1) mod 3, mod_x - 1))) / 10 + kernel(1,1) * to_integer(unsigned(green_array((r_y + 1) mod 3, mod_x))) / 10;
+--					g_sum := g_sum + kernel(2,0) * to_integer(unsigned(green_array((r_y + 2) mod 3, mod_x - 1))) / 10 + kernel(2,1) * to_integer(unsigned(green_array((r_y + 2) mod 3, mod_x))) / 10;
+--					
+--					b_sum := b_sum + kernel(0,0) * to_integer(unsigned(blue_array(r_y, mod_x - 1))) / 10 + kernel(0,1) * to_integer(unsigned(blue_array(r_y, mod_x))) / 10;
+--					b_sum := b_sum + kernel(1,0) * to_integer(unsigned(blue_array((r_y + 1) mod 3, mod_x - 1))) / 10 + kernel(1,1) * to_integer(unsigned(blue_array((r_y + 1) mod 3, mod_x))) / 10;
+--					b_sum := b_sum + kernel(2,0) * to_integer(unsigned(blue_array((r_y + 2) mod 3, mod_x - 1))) / 10 + kernel(2,1) * to_integer(unsigned(blue_array((r_y + 2) mod 3, mod_x))) / 10;
+--				end if;
+--				
+--				mod_red(mod_x) := std_logic_vector(to_unsigned(r_sum, 8));
+--				mod_green(mod_x) := std_logic_vector(to_unsigned(g_sum, 8));
+--				mod_blue(mod_x) := std_logic_vector(to_unsigned(b_sum, 8));
+--				
+--				--LEDG(7 downto 0) <= mod_red(9);
+--				
+--				if(mod_x = 9) then
+--					mod_x := 0;
+--					done <= '1';
+--				else
+--					done <= '0';	
+--					mod_x := mod_x + 1;
+--				end if;
 			end if;
 			
-			if(writebits = '1') then
-				if(colour_type = red) then
-					GPIO_0(7 downto 0) <= mod_red(r_x);
-					LEDG(7 downto 0) <= mod_red(0);
-					if(r_x = 9) then
-						r_x := 0;
-					else
-						r_x := r_x + 1;
-					end if;
-					colour_type := green;
-					--LEDR(17 downto 15) <= "100";
-				elsif(colour_type = green) then
-					GPIO_0(7 downto 0) <= mod_green(g_x);
-					--LEDG(7 downto 0) <= mod_green(g_x);
-					if(g_x = 9) then
-						g_x := 0;
-					else
-						g_x := g_x + 1;
-					end if;
-					colour_type := blue;
-					--LEDR(17 downto 15) <= "010";
-				else
-					GPIO_0(7 downto 0) <= mod_blue(b_x);
-					--LEDG(7 downto 0) <= mod_blue(b_x);
-					if(b_x = 9) then
-						b_x := 0;
-					else
-						b_x := b_x + 1;
-					end if;
-					colour_type := red;
-					--LEDR(17 downto 15) <= "001";
-				end if;
+    		if(writebits = '1') then
+--				if(colour_type = red) then
+--					GPIO_0(7 downto 0) <= mod_red(r_x);
+--					LEDG(7 downto 0) <= mod_red(0);
+--					if(r_x = 9) then
+--						r_x := 0;
+--					else
+--						r_x := r_x + 1;
+--					end if;
+--					colour_type := green;
+--					--LEDR(17 downto 15) <= "100";
+--				elsif(colour_type = green) then
+--					GPIO_0(7 downto 0) <= mod_green(g_x);
+--					--LEDG(7 downto 0) <= mod_green(g_x);
+--					if(g_x = 9) then
+--						g_x := 0;
+--					else
+--						g_x := g_x + 1;
+--					end if;
+--					colour_type := blue;
+--					--LEDR(17 downto 15) <= "010";
+--				else
+--					GPIO_0(7 downto 0) <= mod_blue(b_x);
+--					--LEDG(7 downto 0) <= mod_blue(b_x);
+--					if(b_x = 9) then
+--						b_x := 0;
+--					else
+--						b_x := b_x + 1;
+--					end if;
+--					colour_type := red;
+--					--LEDR(17 downto 15) <= "001";
+--				end if;
 				done <= '1';
 			end if;
 			
@@ -230,7 +230,7 @@ begin
   
 	--FINITE STATE MACHINE
 	process (CLOCK_50)
-		type state_type is (readyState, readyState2, waitForDone, waitForAckno3, waitForAckno4, readState2, idleState, readState, modifyState, idleState2, idleState3, writeState, signalState, signalState2, waitState, waitForAckno, waitForAckno2, resetVariables);
+		type state_type is (readyState, resetState, doneLoading, check1, check2, check3, readyState2, waitForDone, waitForAckno3, waitForAckno4, readState2, idleState, readState, modifyState, idleState2, idleState3, writeState, signalState, signalState2, waitState, waitForAckno, waitForAckno2, resetVariables);
 		variable count_p : integer := 0;
 		variable ackno : std_logic; --ackno used as an indicator from pi to DE2 that tells the DE2 to read data
 		variable present_state : state_type := readyState; --present_state represents the current state
@@ -396,67 +396,61 @@ begin
 				  when idleState2 =>
 						if(GPIO_1(13) = '1') then
 							LEDR(3 downto 0) <= "1000";
-							writebits <= '1';
-							DE2_ackno <= '0';
-							next_State := writeState;
+							writebits <= '0';
+							next_state := writeState;
 						else
-							DE2_ackno <= '0';
 							LEDR(3 downto 0) <= "0100";
 							writebits <= '0';
-							next_State := idleState2; --check for other conditions afterwards
+							next_state := idleState2; --check for other conditions afterwards
 						end if;
 				  when writeState =>
-					 if(count_f = 29) then
-						LEDR(3 downto 0) <= "1111";
-						DE2_ackno <= '0';
-						writebits <= '0';
-						count_f := 0;
-						next_state := readyState2;
-					 elsif(done = '1') then
-						LEDR(3 downto 0) <= "1001";
-						writebits <= '0';
-						DE2_ackno <= '1';
-						count_f := count_f + 1;
-						next_state := waitForDone;
-					 else
-						DE2_ackno <= '0';
-						count_f := count_f;
-						LEDR(3 downto 0) <= "1000";
-						writebits <= '0';
-						next_state := writeState;
-					 end if;
-				  when waitForDone =>
-					if(done = '0') then
-						writebits <= '0';
-						LEDR(17 downto 13) <= std_logic_vector(to_unsigned(count_f, 5));
-						next_state := waitState;
-					else
-						writebits <= '0';
-						next_state := waitForDone;
-					end if;
-				  when waitState => --wait until the ready is set to 0
-					 if(pi_ready = '0') then
-						LEDR(3 downto 0) <= "1010";
-						next_state := signalState;
-					 else
-						LEDR(3 downto 0) <= "1011";
-						next_state := waitState;
-					 end if;
-				  when signalState2 =>
-						if (pi_ready = '0') then
-							next_state :=  idleState2;
-							DE2_ackno <= '0';
-						else
+						if(done = '1') then
+							writebits <= '0';
 							DE2_ackno <= '1';
+							next_state := doneLoading;
+						else
+							writebits <= '1';
+							DE2_ackno <= '0';
+							next_state := writeState;
+						end if;
+				  when doneLoading =>
+						LEDR(3 downto 0) <= "1111";
+						if(pi_ready <= '0') then
+							writebits <= '0';
+							DE2_ackno <= '0';
+							next_state := check1;
+						else
+							writebits <= '0';
+							DE2_ackno <= '1';
+							next_state := doneLoading;
+						end if;
+				  when check1 =>
+						LEDR(3 downto 0) <= "0001";
+						if(pi_ready <= '1') then
+							writebits <= '0';
+							DE2_ackno <= '1';
+							next_state := check2;
+						else
+							writebits <= '0';
+							DE2_ackno <= '0';
+							next_state := check1;
+						end if;
+				  when check2 =>
+						LEDR(3 downto 0) <= "0010";
+						if(pi_ready = '0') then
+							writebits <= '0';
+							DE2_ackno <= '0';
+							next_state := resetState;
+						else
+							writebits <= '0';
+							DE2_ackno <= '1';
+							next_state := check2;
 						end if;
 				  when others =>
-						if (pi_ready = '1') then
-							LEDR(3 downto 0) <= "0110";
-							next_state := signalState2;
-						else
-							DE2_ackno <= '0';
-							next_state := signalState;
-						end if;
+						DE2_ackno <= '0';
+						writebits <= '0';
+						
+						next_state := idleState2;
 				  end case;
 			present_state := next_state;
 		end if;
