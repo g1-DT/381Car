@@ -38,8 +38,8 @@
 unsigned char *raw_image = NULL;
 
 int color_space = JCS_RGB; 
-int width = 200;
-int height = 200;
+int width = 20;
+int height = 20;
 int bytes_per_pixel = 3;
 
 void setGPIO(int size, int GPIO_out[], int inOrOut);
@@ -49,6 +49,8 @@ int doHandshake(int GPIO_in[]);
 void resetPiOutputs(int GPIO_out[]);
 void loadGPIO(int dec, int GPIO_in[]);
 void negateBits(int GPIO_in[], int GPIO_out[]);
+void sendData(int GPIO_out[], int data);
+int recvData(int GPIO_in[]);
 
 /**
  * read_jpeg_file Reads from a jpeg file on disk specified by filename and saves into the
@@ -103,15 +105,39 @@ int read_jpeg_file(char *filename, int GPIO_in[], int GPIO_out[]) {
 
   /* now actually read the jpeg into the raw buffer */
   row_pointer[0] = (unsigned char *)malloc( cinfo.output_width*cinfo.num_components );
-
+  int count = 0;
   /* read one scan line at a time */
   while( cinfo.output_scanline < cinfo.image_height ) {
       jpeg_read_scanlines( &cinfo, row_pointer, 1 );
       for( i=0; i<cinfo.image_width*cinfo.num_components;i++) {
-        loadGPIO(row_pointer[0][i], GPIO_out);
-	      raw_image[location++] = doHandshake(GPIO_in);
+        /*
+        if(count == 0) {
+          count++;
+          raw_image[location++] = row_pointer[0][i];
+        } else if (count == 1) {
+          count++;
+          raw_image[location++] = 0;
+        } else {
+          raw_image[location++] = 0;
+          count = 0;
+        }
+        */
+        
+        raw_image[location++] = row_pointer[0][i];
+        //loadGPIO(row_pointer[0][i], GPIO_out);
+        //printf("sending: %i, color %i\n", count, row_pointer[0][i]);
+        //sendData(GPIO_out, row_pointer[0][i]);
+        //resetPiOutputs(GPIO_out);
+        count++;
       }
   }
+
+  //printf("Recieved data: %i\n", recvData(GPIO_in));
+/*
+  for(int j = 0; j < width*height*bytes_per_pixel; j++) {
+    raw_image[j] = recvData(GPIO_in);
+  }
+  */
 
   /* wrap up decompression, destroy objects, free pointers and close open files */
   jpeg_finish_decompress(&cinfo);
@@ -188,22 +214,61 @@ int main(int argc, char **argv) {
   setGPIO(10, outputGPIO, 0);
   setGPIO(10, inputGPIO, 1);
 
+    for(int i = 0; i < 30; i++) {
+      sendData(outputGPIO, i);
+    }
+    for(int i = 0; i < 30; i++) {
+      sendData(outputGPIO, i);
+    } 
+    for(int i = 0; i < 30; i++) {
+      recvData(inputGPIO);
+    }
+
+    printf("Done\n");
+/*
+    for(int i = 0; i < 30; i++) {
+      sendData(outputGPIO, i);
+    }
+*/
+
+//sendData(outputGPIO, 5);
+
+  //printf("Recieved data: %i\n", recvData(inputGPIO));
+  
   /* Try opening a jpeg*/
-  if(read_jpeg_file(infilename, inputGPIO, outputGPIO) > 0) {
+
+  //if(read_jpeg_file(infilename, inputGPIO, outputGPIO) > 0) {
 
       //negateBits(inputGPIO, outputGPIO);
       /* then copy it to another file */
-      if(write_jpeg_file(outfilename) < 0) {
-	       return -1;
-      }
-  }
+      //if(write_jpeg_file(outfilename) < 0) {
+         //return -1;
+      //}
+  //}
+
   return 0;
+}
+
+void sendData(int GPIO_out[], int data) {
+  loadGPIO(data, GPIO_out);
+  // Make sure the DE2_READY is high so wait until it is ready
+  while(digitalRead(DE2_READY) == LOW);
+
+  // Indicate to the DE2 the PI is ready to write
+  digitalWrite(PI_ACKNO, HIGH);
+
+  // Make sure the DE2_READY is done reading
+  while(digitalRead(DE2_READY) == LOW);
+
+  // Reset the PI acknowledge signal
+  digitalWrite(PI_ACKNO, LOW);
+  return;
 }
 
 void setGPIO(int size, int GPIO_out[], int inOrOut) {
   //Set the ready to low initially
   digitalWrite(PI_ACKNO, LOW);
-  digitalWrite(PI_READY, HIGH);
+  digitalWrite(PI_READY, LOW);
 
   // Input select
   if(inOrOut) {
@@ -282,4 +347,61 @@ void negateBits(int GPIO_in[], int GPIO_out[]) {
     raw_image[i] = doHandshake(GPIO_in);
   }
   return;
+}
+
+int recvData(int GPIO_in[]) {
+  printf("Here\n");
+
+
+  digitalWrite(PI_READY, HIGH);
+
+  //delay(100);
+  printf("Here1\n");
+  while(digitalRead(DE2_ACKNO) == 0); 
+
+  digitalWrite(PI_READY, LOW);
+
+  //delay(100);
+  printf("Here2\n");
+  while(digitalRead(DE2_ACKNO) == 1);
+
+  int value = 0;
+  for(int i = 7; i >= 0; i--) {
+    if(i == 0) {
+      value = (value | digitalRead(GPIO_in[i]));
+    } else {
+      value = (value | digitalRead(GPIO_in[i])) << 1;
+    }
+  }
+  printf("Getting value: %i\n", value);
+  digitalWrite(PI_READY, HIGH);
+
+  printf("Here4\n");
+  while(digitalRead(DE2_ACKNO) == 0);
+
+  //delay(100);
+  digitalWrite(PI_READY, LOW);
+
+  while(digitalRead(DE2_ACKNO) == 1);
+  printf("Here5\n");
+  //delay(100);
+
+  return value;
+/*
+  int value = 0;
+
+  for(int i = 7; i >= 0; i--) {
+    if(i == 0) {
+      value = (value | digitalRead(GPIO_in[i]));
+    } else {
+      value = (value | digitalRead(GPIO_in[i])) << 1;
+    }
+  }
+
+
+  printf("Here:\n");
+  while(digitalRead(DE2_ACKNO) == 1);
+
+  return value;
+*/
 }
