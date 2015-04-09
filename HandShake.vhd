@@ -73,7 +73,7 @@ begin
 						r_x := r_x + 1;
 					end if;
 					colour_type := green;
-					LEDR(17 downto 15) <= "100";
+					--LEDR(17 downto 15) <= "100";
 				elsif(colour_type = green) then
 					green_array(g_y,g_x) := readData(7 downto 0);
 					if(g_x = 9 and g_y = 2) then
@@ -86,7 +86,7 @@ begin
 						g_x := g_x + 1;
 					end if;
 					colour_type := blue;
-					LEDR(17 downto 15) <= "010";
+					--LEDR(17 downto 15) <= "010";
 				else
 					blue_array(b_y,b_x) := readData(7 downto 0);
 					if(b_x = 9 and b_y = 2) then
@@ -99,7 +99,7 @@ begin
 						b_x := b_x + 1;
 					end if;
 					colour_type := red;
-					LEDR(17 downto 15) <= "001";
+					--LEDR(17 downto 15) <= "001";
 				end if;
 				--LEDG(7 downto 0) <= blue_array(1,9);
 				done <= '1';
@@ -107,7 +107,7 @@ begin
 			
 			if(modifybits = '1') then
 				--Computes kernel depending on kernel mode
-				if(kernel_mode = "0000") then
+				--if(GPIO_1(10) = '1') then
 					kernel(0,0) := 0;
 					kernel(0,1) := 0;
 					kernel(0,2) := 0;
@@ -117,7 +117,7 @@ begin
 					kernel(2,0) := 0;
 					kernel(2,1) := 5;
 					kernel(2,2) := 0;
-				end if;
+				
 				
 				r_sum := 0;
 				g_sum := 0;
@@ -149,6 +149,7 @@ begin
 					b_sum := b_sum + kernel(0,1) * to_integer(unsigned(blue_array(r_y, mod_x))) / 10 + kernel(0, 2) * to_integer(unsigned(blue_array(r_y, mod_x + 1))) / 10;
 					b_sum := b_sum + kernel(1,1) * to_integer(unsigned(blue_array((r_y + 1) mod 3, mod_x))) / 10 + kernel(1, 2) * to_integer(unsigned(blue_array((r_y + 1) mod 3, mod_x + 1))) / 10;
 					b_sum := b_sum + kernel(2,1) * to_integer(unsigned(blue_array((r_y + 2) mod 3, mod_x))) / 10 + kernel(2, 2) * to_integer(unsigned(blue_array((r_y + 2) mod 3, mod_x + 1))) / 10;
+				
 				end if;
 				if( mod_x = 9) then
 					r_sum := r_sum + kernel(0,0) * to_integer(unsigned(red_array(r_y, mod_x - 1))) / 10 + kernel(0,1) * to_integer(unsigned(red_array(r_y, mod_x))) / 10;
@@ -168,18 +169,49 @@ begin
 				mod_green(mod_x) := std_logic_vector(to_unsigned(g_sum, 8));
 				mod_blue(mod_x) := std_logic_vector(to_unsigned(b_sum, 8));
 				
-				LEDG(7 downto 0) <= mod_red(2);
+				--LEDG(7 downto 0) <= mod_red(9);
 				
 				if(mod_x = 9) then
 					mod_x := 0;
+					done <= '1';
 				else
+					done <= '0';	
 					mod_x := mod_x + 1;
 				end if;
-				done <= '1';
 			end if;
 			
 			if(writebits = '1') then
-				--GPIO_0(7 downto 0) <= green_array(0,9);
+				if(colour_type = red) then
+					GPIO_0(7 downto 0) <= mod_red(r_x);
+					LEDG(7 downto 0) <= mod_red(0);
+					if(r_x = 9) then
+						r_x := 0;
+					else
+						r_x := r_x + 1;
+					end if;
+					colour_type := green;
+					--LEDR(17 downto 15) <= "100";
+				elsif(colour_type = green) then
+					GPIO_0(7 downto 0) <= mod_green(g_x);
+					--LEDG(7 downto 0) <= mod_green(g_x);
+					if(g_x = 9) then
+						g_x := 0;
+					else
+						g_x := g_x + 1;
+					end if;
+					colour_type := blue;
+					--LEDR(17 downto 15) <= "010";
+				else
+					GPIO_0(7 downto 0) <= mod_blue(b_x);
+					--LEDG(7 downto 0) <= mod_blue(b_x);
+					if(b_x = 9) then
+						b_x := 0;
+					else
+						b_x := b_x + 1;
+					end if;
+					colour_type := red;
+					--LEDR(17 downto 15) <= "001";
+				end if;
 				done <= '1';
 			end if;
 			
@@ -198,11 +230,12 @@ begin
   
 	--FINITE STATE MACHINE
 	process (CLOCK_50)
-		type state_type is (readyState, readyState2, waitForAckno3, waitForAckno4, readState2, idleState, readState, modifyState, idleState2, idleState3, writeState, signalState, waitState, waitForAckno, waitForAckno2, resetVariables);
+		type state_type is (readyState, readyState2, waitForDone, waitForAckno3, waitForAckno4, readState2, idleState, readState, modifyState, idleState2, idleState3, writeState, signalState, signalState2, waitState, waitForAckno, waitForAckno2, resetVariables);
 		variable count_p : integer := 0;
 		variable ackno : std_logic; --ackno used as an indicator from pi to DE2 that tells the DE2 to read data
-		variable present_state : state_type := idleState; --present_state represents the current state
+		variable present_state : state_type := readyState; --present_state represents the current state
 		variable next_state : state_type; --next_state represents the next state transition for next iteration
+		variable count_f : integer := 0;
 	begin
 		if(rising_edge(CLOCK_50)) then
 			case present_state is
@@ -215,7 +248,7 @@ begin
 				 ready <= '1';
 				 DE2_ackno <= '0';
 				 next_state := idleState;
-				 LEDR(3 downto 0) <= "0000";
+				 LEDR(3 downto 0) <= "0001";
 				--Wait for acknowledge signal to know when data is in the GPIO, if acknowledge is set then go to ready state
 				when idleState =>
 				 if(ackno = '1') then
@@ -289,7 +322,7 @@ begin
 					ready <= '1';
 					DE2_ackno <= '0';
 					next_state := idleState3;
-					LEDR(3 downto 0) <= "0000";
+					LEDR(3 downto 0) <= "0011";
 				 when idleState3 =>
 				  if(ackno = '1') then
 					LEDR(3 downto 0) <= "0010";
@@ -320,7 +353,7 @@ begin
 				 else
 					ready <= '0';
 					readbits <= '0';
-					LEDR(3 downto 0) <= "1000";
+					LEDR(3 downto 0) <= "1001";
 					next_state := readState2;
 				 end if;
 				 --confirm the acknowledge is back to 0
@@ -363,39 +396,65 @@ begin
 				  when idleState2 =>
 						if(GPIO_1(13) = '1') then
 							LEDR(3 downto 0) <= "1000";
+							writebits <= '1';
+							DE2_ackno <= '0';
 							next_State := writeState;
 						else
+							DE2_ackno <= '0';
 							LEDR(3 downto 0) <= "0100";
-							readbits <= '0';
+							writebits <= '0';
 							next_State := idleState2; --check for other conditions afterwards
 						end if;
 				  when writeState =>
-					 if(done = '1') then
-						LEDR(3 downto 0) <= "1000";
+					 if(count_f = 29) then
+						LEDR(3 downto 0) <= "1111";
+						DE2_ackno <= '0';
+						writebits <= '0';
+						count_f := 0;
+						next_state := readyState2;
+					 elsif(done = '1') then
+						LEDR(3 downto 0) <= "1001";
 						writebits <= '0';
 						DE2_ackno <= '1';
-						next_state := waitState;
+						count_f := count_f + 1;
+						next_state := waitForDone;
 					 else
-						LEDR(3 downto 0) <= "0111";
-						readbits <= '0';
-						writebits <= '1';
+						DE2_ackno <= '0';
+						count_f := count_f;
+						LEDR(3 downto 0) <= "1000";
+						writebits <= '0';
 						next_state := writeState;
 					 end if;
+				  when waitForDone =>
+					if(done = '0') then
+						writebits <= '0';
+						LEDR(17 downto 13) <= std_logic_vector(to_unsigned(count_f, 5));
+						next_state := waitState;
+					else
+						writebits <= '0';
+						next_state := waitForDone;
+					end if;
 				  when waitState => --wait until the ready is set to 0
 					 if(pi_ready = '0') then
-						LEDR(3 downto 0) <= "1001";
+						LEDR(3 downto 0) <= "1010";
 						next_state := signalState;
 					 else
-						LEDR(3 downto 0) <= "1000";
+						LEDR(3 downto 0) <= "1011";
 						next_state := waitState;
 					 end if;
-				  when others =>
-						if(pi_ready = '1') then
-							LEDR(3 downto 0) <= "0000";
+				  when signalState2 =>
+						if (pi_ready = '0') then
+							next_state :=  idleState2;
 							DE2_ackno <= '0';
-							next_state := readyState;	
 						else
-							LEDR(3 downto 0) <= "1001";
+							DE2_ackno <= '1';
+						end if;
+				  when others =>
+						if (pi_ready = '1') then
+							LEDR(3 downto 0) <= "0110";
+							next_state := signalState2;
+						else
+							DE2_ackno <= '0';
 							next_state := signalState;
 						end if;
 				  end case;
