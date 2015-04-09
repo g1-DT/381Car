@@ -3,11 +3,11 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 
 entity servo_pwm is
-    Port ( clk          : in  STD_LOGIC;
-               reset    : in  STD_LOGIC; 
+    Port ( clk           : in  STD_LOGIC;
+               reset      : in  STD_LOGIC; 
                button_l : in  STD_LOGIC;  
                button_r : in  STD_LOGIC; 
-               pwm      : out  STD_LOGIC);
+               pwm       : out  STD_LOGIC);
    end servo_pwm;
 
 architecture Behavioral of servo_pwm is

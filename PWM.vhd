@@ -4,8 +4,8 @@ use ieee.numeric_std.all;
 
 entity PWM is
   port(CLOCK_50            : in  std_logic;
-       SW                  : in  std_logic_vector(17 downto 0);
-		 GPIO_1					: inout std_logic_vector(35 downto 0));
+       SW                  : in  std_logic;
+		 GPIO_1					: inout std_logic_vector(35 downto 24));
 		 --35 downto 32 output to PWM
 		 --31 downto 28 input from pi
 		 --LEDG : out std_logic_vector(7 downto 0));
@@ -30,28 +30,28 @@ begin
 	servoL_1 : servo_pwm port map(
 			clk=>CLOCK_50,
 			reset=>NOT motor_L1,
-			button_l=>SW(16),
+			button_l=>SW,
 			button_r=>motor_L1,
 			pwm=>GPIO_1(34)
 			);
 	servoL_2 : servo_pwm port map(
 			clk=>CLOCK_50,
 			reset=>NOT motor_L2,
-			button_l=>SW(16),
+			button_l=>SW,
 			button_r=>motor_L2,
 			pwm=>GPIO_1(35)
 			);
 	servoR_1 : servo_pwm port map(
 			clk=>CLOCK_50,
 			reset=>NOT motor_R1,
-			button_l=>SW(16),
+			button_l=>SW,
 			button_r=>motor_R1,
 			pwm=>GPIO_1(32)
 			);
 	servoR_2 : servo_pwm port map(
 			clk=>CLOCK_50,
 			reset=>NOT motor_R2,
-			button_l=>SW(16),
+			button_l=>SW,
 			button_r=>motor_R2,
 			pwm=>GPIO_1(33)
 			);
@@ -91,16 +91,14 @@ begin
 
 process (CLOCK_50)
 begin
-	if(rising_edge(CLOCK_50)) then	
+	if(rising_edge(CLOCK_50)) then
 --		if(sensor1 = '0' OR sensor2 = '0' OR sensor3 = '0' OR sensor4 = '0' ) then
 --				motor_L1<='0';
 --				motor_L2<='0';
 --				motor_R1<='0';
 --				motor_R2<='0';
---		end if;
-		
-		--sensor1 = back, sensor2 = left, sensor3 = right, sensor4 = front
-		
+--		else
+-- sensor1 =back, sensor2
 			if(go_left = '1' AND sensor2 = '1') then
 				--LEDG(2 downto 0)<="010";
 				--reset<='0';
